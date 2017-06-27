@@ -1,5 +1,6 @@
 assignments = []
 
+
 def assign_value(values, box, value):
     """
     Please use this function to update your values dictionary!
@@ -62,7 +63,8 @@ def display(values):
     for r in rows:
         print(''.join(values[r+c].center(width)+('|' if c in '36' else '')
                       for c in cols))
-        if r in 'CF': print(line)
+        if r in 'CF':
+            print(line)
     return
 
 def eliminate(values):
@@ -145,6 +147,11 @@ def solve(grid):
     Returns:
         The dictionary representation of the final sudoku grid. False if no solution exists.
     """
+    
+
+rows = 'ABCDEFGHI'
+cols = '123456789'
+boxes = cross(rows, cols)
 
 if __name__ == '__main__':
     diag_sudoku_grid = '2.............62....1....7...6..8...3...9...7...6..4...4....8....52.............3'

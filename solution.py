@@ -39,28 +39,34 @@ def naked_twins(values, n=2):
     """
     # Find all instances of naked twins
     for unit in unitlist:
+        #print(unit_val)
         rev_dict = {}
+        # unit > ['A1', 'A2', 'A3', 'A4', 'A5', 'A6', 'A7', 'A8', 'A9']
         for i in unit:
+            #print(values[i], len(values[i]))
             if len(values[i]) == n:
                 rev_dict.setdefault(values[i], list())
                 rev_dict[values[i]].append(i)
 
-    naked_group_list = [rev_dict[digit] for digit in rev_dict if len(rev_dict[digit]) == n]
-    
-    # eliminate naked_group values from peers
-    for group in naked_group_list:
-        # peers at the intersction of the naked_group's
-        intersect_peers = set()
-        for g in group:
-            intersect_peers = intersect_peers & peers[g]
+        # if (rev_dict):
+        #     print(rev_dict)
+        #print(rev_dict)
+        naked_group_list = [rev_dict[digits] for digits in rev_dict if len(rev_dict[digits]) == n]
+        #print(naked_group_list)
+        
+        # eliminate naked_group values from peers
+        for group in naked_group_list:
+            # peers at the intersction of the naked_group's
+            intersect_peers = peers[group[0]]
+            for g in group:
+                intersect_peers = intersect_peers & peers[g]
 
-        for digit in values[group[0]]:
-            # all digits w/in the group are the same,`0` in `group[0]` is 
-            # selected since this group will always be present
-            for box in peers:
-                if digit in values[box]:
-                    assign_value(values, box, values[box].replace(digit, ''))
-                    #values[box].replace(digit, '')
+            for digit in values[group[0]]:
+                # all digits w/in the group are the same,`0` in `group[0]` is 
+                # selected since this group will always be present
+                for box in intersect_peers:
+                    if digit in values[box]:
+                        values = assign_value(values, box, values[box].replace(digit, ''))
     
     return values
 
@@ -117,7 +123,7 @@ def eliminate(values):
         digit = values[box]
         for peer in peers[box]:
             #values[peer] = values[peer].replace(digit,'')
-            assign_value(values, peer, values[peer].replace(digit, ''))
+            values = assign_value(values, peer, values[peer].replace(digit, ''))
     return values
 
 def only_choice(values):
@@ -132,7 +138,7 @@ def only_choice(values):
         for digit in '123456789':
             dplaces = [box for box in unit if digit in values[box]]
             if len(dplaces) == 1:
-                assign_value(values, dplaces[0], digit)
+                values = assign_value(values, dplaces[0], digit)
     return values
 
 def reduce_puzzle(values):
@@ -177,7 +183,7 @@ def search(values):
         if attempt:
             return attempt
 
-def solve(grid):
+def solve(grid, DIAGONAL=False):
     """
     Find the solution to a Sudoku grid.
     Args:
@@ -187,7 +193,6 @@ def solve(grid):
         The dictionary representation of the final sudoku grid. False if no solution exists.
     """
     global unitlist
-    DIAGONAL = True
 
     if DIAGONAL:
         unitlist += [['A1','B2','C3','D4','E5','F6','G7','H8','I9'],['A9','B8','C7','D6','E5','F4','G3','H2','I1']]
@@ -208,7 +213,7 @@ if __name__ == '__main__':
 
     print(2*"\n--------------------------------------------------")
 
-    solved = solve(diag_sudoku_grid)
+    solved = solve(diag_sudoku_grid, DIAGONAL=True)
     display(solved)
 
 

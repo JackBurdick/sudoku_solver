@@ -47,3 +47,4 @@ Temporary Items
 .apdisk
 objects/__pycache__/*
 __pycache__/*
+.udacity-pa/__pycache__/*

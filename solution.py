@@ -1,5 +1,7 @@
 assignments = []
 
+DIAGONAL=True
+
 # set up
 rows = 'ABCDEFGHI'
 cols = '123456789'
@@ -11,7 +13,10 @@ boxes = cross(rows, cols)
 row_units = [cross(r, cols) for r in rows]
 column_units = [cross(rows, c) for c in cols]
 square_units = [cross(rs, cs) for rs in ('ABC','DEF','GHI') for cs in ('123','456','789')]
+
 unitlist = row_units + column_units + square_units
+if DIAGONAL:
+        unitlist += [['A1','B2','C3','D4','E5','F6','G7','H8','I9'],['A9','B8','C7','D6','E5','F4','G3','H2','I1']]
 units = dict((s, [u for u in unitlist if s in u]) for s in boxes)
 # unit [example]> ['A1', 'A2', 'A3', 'A4', 'A5', 'A6', 'A7', 'A8', 'A9']
 peers = dict((s, set(sum(units[s],[]))-set([s])) for s in boxes)
@@ -51,9 +56,10 @@ def naked_twins(values, n=2):
         
         # eliminate naked_group values from peers
         for group in naked_group_list:
-            # peers at the intersction of the naked_group's
+            # peers at the intersection of the naked_group's
             intersect_peers = peers[group[0]]
             for g in group:
+                # 'bitwise' `and` on the sets
                 intersect_peers = intersect_peers & peers[g]
 
             for digit in values[group[0]]:
@@ -199,7 +205,7 @@ def search(values):
             return attempt
 
 
-def solve(grid, DIAGONAL=False):
+def solve(grid):
     """
     Find the solution to a Sudoku grid.
     Args:
@@ -208,18 +214,15 @@ def solve(grid, DIAGONAL=False):
     Returns:
         The dictionary representation of the final sudoku grid. False if no solution exists.
     """
-    global unitlist
-
-    if DIAGONAL:
-        unitlist += [['A1','B2','C3','D4','E5','F6','G7','H8','I9'],['A9','B8','C7','D6','E5','F4','G3','H2','I1']]
-
+    
     values = grid_values(grid)
     values = search(values)
     return values
 
 
 if __name__ == '__main__':
-    diag_sudoku_grid = '2.............62....1....7...6..8...3...9...7...6..4...4....8....52.............3'
+    #diag_sudoku_grid = '2.............62....1....7...6..8...3...9...7...6..4...4....8....52.............3'
+    diag_sudoku_grid = '9.1....8.8.5.7..4.2.4....6...7......5..............83.3..6......9................'
 
     vals = []
     vals.extend(diag_sudoku_grid)
@@ -227,7 +230,7 @@ if __name__ == '__main__':
     display(unsolved)
 
     print(2*"\n--------------------------------------------------")
-    solved = solve(diag_sudoku_grid, DIAGONAL=True)
+    solved = solve(diag_sudoku_grid)
     display(solved)
 
     try:
@@ -237,4 +240,4 @@ if __name__ == '__main__':
     except SystemExit:
         pass
     except:
-        print('We could not visualize your board due to a pygame issue. Not a problem! It is not a requirement.')
+        print('Could not visualize your board due to a pygame issue.')

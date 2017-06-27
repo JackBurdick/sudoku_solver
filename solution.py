@@ -186,18 +186,19 @@ def solve(grid):
     Returns:
         The dictionary representation of the final sudoku grid. False if no solution exists.
     """
+    global unitlist
+    DIAGONAL = True
+
+    if DIAGONAL:
+        unitlist += [['A1','B2','C3','D4','E5','F6','G7','H8','I9'],['A9','B8','C7','D6','E5','F4','G3','H2','I1']]
+
     values = grid_values(grid)
     values = search(values)
     return values
 
 
 if __name__ == '__main__':
-    DIAGONAL = True
-
     diag_sudoku_grid = '2.............62....1....7...6..8...3...9...7...6..4...4....8....52.............3'
-
-    if DIAGONAL:
-        unitlist += [['A1','B2','C3','D4','E5','F6','G7','H8','I9'],['A9','B8','C7','D6','E5','F4','G3','H2','I1']]
 
 
     vals = []

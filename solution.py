@@ -1,6 +1,7 @@
 assignments = []
 
 
+
 def assign_value(values, box, value):
     """
     Please use this function to update your values dictionary!
@@ -106,9 +107,10 @@ def reduce_puzzle(values):
         # check how many boxes have a determined value
         solved_values_before = len([box for box in values.keys() if len(values[box]) == 1])
 
-        # eliminate and fill only_choice boxes
+        # implement strategies
         values = eliminate(values)
         values = only_choice(values)
+        values = naked_twins()
         
         # check how many boxes have a determined value, and compare
         solved_values_after = len([box for box in values.keys() if len(values[box]) == 1])
@@ -124,6 +126,7 @@ def search(values):
     values = reduce_puzzle(values)
     if values is False:
         return False ## Failed earlier
+
     if all(len(values[s]) == 1 for s in boxes): 
         return values ## Solved!
    
@@ -147,7 +150,10 @@ def solve(grid):
     Returns:
         The dictionary representation of the final sudoku grid. False if no solution exists.
     """
-    
+    values = grid_values(grid)
+    values = search(values)
+    return values
+
 
 rows = 'ABCDEFGHI'
 cols = '123456789'

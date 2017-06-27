@@ -1,11 +1,23 @@
 assignments = []
 
+# set up
+rows = 'ABCDEFGHI'
+cols = '123456789'
+def cross(A, B):
+    "Cross product of elements in A and elements in B."
+    return [s+t for s in A for t in B]
+boxes = cross(rows, cols)
+row_units = [cross(r, cols) for r in rows]
+column_units = [cross(rows, c) for c in cols]
+square_units = [cross(rs, cs) for rs in ('ABC','DEF','GHI') for cs in ('123','456','789')]
+unitlist = row_units + column_units + square_units
+units = dict((s, [u for u in unitlist if s in u]) for s in boxes)
+peers = dict((s, set(sum(units[s],[]))-set([s])) for s in boxes)
 
 
 def assign_value(values, box, value):
     """
-    Please use this function to update your values dictionary!
-    Assigns a value to a given box. If it updates the board record it.
+    Update values dictionary by assigning a value to a given box. 
     """
 
     # don't append actions that don't change any values
@@ -17,7 +29,7 @@ def assign_value(values, box, value):
         assignments.append(values.copy())
     return values
 
-def naked_twins(values):
+def naked_twins(values, n=2):
     """Eliminate values using the naked twins strategy.
     Args:
         values(dict): a dictionary of the form {'box_name': '123456789', ...}
@@ -25,13 +37,33 @@ def naked_twins(values):
     Returns:
         the values dictionary with the naked twins eliminated from peers.
     """
-
     # Find all instances of naked twins
-    # Eliminate the naked twins as possibilities for their peers
+    for unit in unitlist:
+        rev_dict = {}
+        for i in unit:
+            if len(values[i]) == n:
+                rev_dict.setdefault(values[i], list())
+                rev_dict[values[i]].append(i)
 
-def cross(A, B):
-    "Cross product of elements in A and elements in B."
-    return [s+t for s in A for t in B]
+    naked_group_list = [rev_dict[digit] for digit in rev_dict if len(rev_dict[digit]) == n]
+    
+    # eliminate naked_group values from peers
+    for group in naked_group_list:
+        # peers at the intersction of the naked_group's
+        intersect_peers = set()
+        for g in group:
+            intersect_peers = intersect_peers & peers[g]
+
+        for digit in values[group[0]]:
+            # all digits w/in the group are the same,`0` in `group[0]` is 
+            # selected since this group will always be present
+            for box in peers:
+                if digit in values[box]:
+                    assign_value(values, box, values[box].replace(digit, ''))
+    
+    return values
+
+
 
 def grid_values(grid):
     """Convert grid string into {<box>: <value>} dict with '123456789' value for empties.
@@ -110,7 +142,7 @@ def reduce_puzzle(values):
         # implement strategies
         values = eliminate(values)
         values = only_choice(values)
-        values = naked_twins()
+        values = naked_twins(values, n=2)
         
         # check how many boxes have a determined value, and compare
         solved_values_after = len([box for box in values.keys() if len(values[box]) == 1])
@@ -122,7 +154,7 @@ def reduce_puzzle(values):
     return values
 
 def search(values):
-    # reduce puzzle using the previous function
+    # reduce puzzle
     values = reduce_puzzle(values)
     if values is False:
         return False ## Failed earlier
@@ -130,7 +162,7 @@ def search(values):
     if all(len(values[s]) == 1 for s in boxes): 
         return values ## Solved!
    
-    # choose one of the unfilled squares with the fewest possibilities
+    # choose an unfilled squares with the fewest possibilities
     n,s = min((len(values[s]), s) for s in boxes if len(values[s]) > 1)
     
     # use recurrence to solve each resulting sudoku
@@ -155,19 +187,17 @@ def solve(grid):
     return values
 
 
-rows = 'ABCDEFGHI'
-cols = '123456789'
-boxes = cross(rows, cols)
-
 if __name__ == '__main__':
     diag_sudoku_grid = '2.............62....1....7...6..8...3...9...7...6..4...4....8....52.............3'
-    display(solve(diag_sudoku_grid))
+    sol = solve(diag_sudoku_grid)
+    print(sol.values())
+    display(sol)
 
-    try:
-        from visualize import visualize_assignments
-        visualize_assignments(assignments)
+    # try:
+    #     from visualize import visualize_assignments
+    #     visualize_assignments(assignments)
 
-    except SystemExit:
-        pass
-    except:
-        print('We could not visualize your board due to a pygame issue. Not a problem! It is not a requirement.')
+    # except SystemExit:
+    #     pass
+    # except:
+    #     print('We could not visualize your board due to a pygame issue. Not a problem! It is not a requirement.')

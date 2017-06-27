@@ -7,11 +7,13 @@ def cross(A, B):
     "Cross product of elements in A and elements in B."
     return [s+t for s in A for t in B]
 boxes = cross(rows, cols)
+
 row_units = [cross(r, cols) for r in rows]
 column_units = [cross(rows, c) for c in cols]
 square_units = [cross(rs, cs) for rs in ('ABC','DEF','GHI') for cs in ('123','456','789')]
 unitlist = row_units + column_units + square_units
 units = dict((s, [u for u in unitlist if s in u]) for s in boxes)
+# unit [example]> ['A1', 'A2', 'A3', 'A4', 'A5', 'A6', 'A7', 'A8', 'A9']
 peers = dict((s, set(sum(units[s],[]))-set([s])) for s in boxes)
 
 
@@ -19,7 +21,6 @@ def assign_value(values, box, value):
     """
     Update values dictionary by assigning a value to a given box. 
     """
-
     # don't append actions that don't change any values
     if values[box] == value:
         return values
@@ -28,6 +29,7 @@ def assign_value(values, box, value):
     if len(value) == 1:
         assignments.append(values.copy())
     return values
+
 
 def naked_twins(values, n=2):
     """Eliminate values using the naked twins strategy.
@@ -39,20 +41,13 @@ def naked_twins(values, n=2):
     """
     # Find all instances of naked twins
     for unit in unitlist:
-        #print(unit_val)
         rev_dict = {}
-        # unit > ['A1', 'A2', 'A3', 'A4', 'A5', 'A6', 'A7', 'A8', 'A9']
         for i in unit:
-            #print(values[i], len(values[i]))
             if len(values[i]) == n:
                 rev_dict.setdefault(values[i], list())
                 rev_dict[values[i]].append(i)
 
-        # if (rev_dict):
-        #     print(rev_dict)
-        #print(rev_dict)
         naked_group_list = [rev_dict[digits] for digits in rev_dict if len(rev_dict[digits]) == n]
-        #print(naked_group_list)
         
         # eliminate naked_group values from peers
         for group in naked_group_list:
@@ -69,7 +64,6 @@ def naked_twins(values, n=2):
                         values = assign_value(values, box, values[box].replace(digit, ''))
     
     return values
-
 
 
 def grid_values(grid):
@@ -92,6 +86,7 @@ def grid_values(grid):
     assert len(vals) == 81
     return dict(zip(boxes, vals))
 
+
 def display(values):
     """
     Display the values as a 2-D grid.
@@ -106,6 +101,7 @@ def display(values):
         if r in 'CF':
             print(line)
     return
+
 
 def eliminate(values):
     """Eliminate values from peers of each box with a single value.
@@ -122,9 +118,9 @@ def eliminate(values):
     for box in solved_values:
         digit = values[box]
         for peer in peers[box]:
-            #values[peer] = values[peer].replace(digit,'')
             values = assign_value(values, peer, values[peer].replace(digit, ''))
     return values
+
 
 def only_choice(values):
     """Finalize values that are the only choice for a unit.
@@ -141,7 +137,16 @@ def only_choice(values):
                 values = assign_value(values, dplaces[0], digit)
     return values
 
+
 def reduce_puzzle(values):
+    """Apply constraints in attempt to solve the puzzle.
+
+    Iterate all units, apply `eliminate`, `only_choice`, and `naked_twins` in
+    attempt to solve the puzzle.
+
+    Input: unsolved Sudoku in dictionary form.
+    Output: Resulting Sudoku in dictionary form after applying constraints.
+    """
     stalled = False
     while not stalled:
         # check how many boxes have a determined value
@@ -163,7 +168,17 @@ def reduce_puzzle(values):
             return False
     return values
 
+
 def search(values):
+    """Use Search to efficiently find solutions to the Sudoku.
+
+    Iterate all units, find unfilled squares with the fewest possible options.
+    NOTE: This function is recursive.
+
+
+    Input: Sudoku in dictionary form.
+    Output: Resulting Sudoku in dictionary form (solved).
+    """
     # reduce puzzle
     values = reduce_puzzle(values)
     if values is False:
@@ -182,6 +197,7 @@ def search(values):
         attempt = search(new_sudoku)
         if attempt:
             return attempt
+
 
 def solve(grid, DIAGONAL=False):
     """
@@ -205,17 +221,14 @@ def solve(grid, DIAGONAL=False):
 if __name__ == '__main__':
     diag_sudoku_grid = '2.............62....1....7...6..8...3...9...7...6..4...4....8....52.............3'
 
-
     vals = []
     vals.extend(diag_sudoku_grid)
     unsolved = dict(zip(boxes, vals))
     display(unsolved)
 
     print(2*"\n--------------------------------------------------")
-
     solved = solve(diag_sudoku_grid, DIAGONAL=True)
     display(solved)
-
 
     try:
         from visualize import visualize_assignments

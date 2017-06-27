@@ -60,6 +60,7 @@ def naked_twins(values, n=2):
             for box in peers:
                 if digit in values[box]:
                     assign_value(values, box, values[box].replace(digit, ''))
+                    #values[box].replace(digit, '')
     
     return values
 
@@ -115,7 +116,8 @@ def eliminate(values):
     for box in solved_values:
         digit = values[box]
         for peer in peers[box]:
-            values[peer] = values[peer].replace(digit,'')
+            #values[peer] = values[peer].replace(digit,'')
+            assign_value(values, peer, values[peer].replace(digit, ''))
     return values
 
 def only_choice(values):
@@ -130,7 +132,7 @@ def only_choice(values):
         for digit in '123456789':
             dplaces = [box for box in unit if digit in values[box]]
             if len(dplaces) == 1:
-                values[dplaces[0]] = digit
+                assign_value(values, dplaces[0], digit)
     return values
 
 def reduce_puzzle(values):
@@ -142,7 +144,9 @@ def reduce_puzzle(values):
         # implement strategies
         values = eliminate(values)
         values = only_choice(values)
-        values = naked_twins(values, n=2)
+        groups = [2,3]
+        for i in groups:
+            values = naked_twins(values, n=2)
         
         # check how many boxes have a determined value, and compare
         solved_values_after = len([box for box in values.keys() if len(values[box]) == 1])
@@ -189,15 +193,22 @@ def solve(grid):
 
 if __name__ == '__main__':
     diag_sudoku_grid = '2.............62....1....7...6..8...3...9...7...6..4...4....8....52.............3'
-    sol = solve(diag_sudoku_grid)
-    print(sol.values())
-    display(sol)
+    vals = []
+    vals.extend(diag_sudoku_grid)
+    unsolved = dict(zip(boxes, vals))
+    display(unsolved)
 
-    # try:
-    #     from visualize import visualize_assignments
-    #     visualize_assignments(assignments)
+    print(2*"\n--------------------------------------------------")
 
-    # except SystemExit:
-    #     pass
-    # except:
-    #     print('We could not visualize your board due to a pygame issue. Not a problem! It is not a requirement.')
+    solved = solve(diag_sudoku_grid)
+    display(solved)
+
+
+    try:
+        from visualize import visualize_assignments
+        visualize_assignments(assignments)
+
+    except SystemExit:
+        pass
+    except:
+        print('We could not visualize your board due to a pygame issue. Not a problem! It is not a requirement.')

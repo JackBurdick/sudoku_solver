@@ -146,7 +146,7 @@ def reduce_puzzle(values):
         values = only_choice(values)
         groups = [2,3]
         for i in groups:
-            values = naked_twins(values, n=2)
+            values = naked_twins(values, n=i)
         
         # check how many boxes have a determined value, and compare
         solved_values_after = len([box for box in values.keys() if len(values[box]) == 1])

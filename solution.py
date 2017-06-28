@@ -8,6 +8,7 @@ cols = '123456789'
 def cross(A, B):
     "Cross product of elements in A and elements in B."
     return [s+t for s in A for t in B]
+# boxes are a list of every location on the grid
 boxes = cross(rows, cols)
 
 row_units = [cross(r, cols) for r in rows]
@@ -19,6 +20,8 @@ if DIAGONAL:
         unitlist += [['A1','B2','C3','D4','E5','F6','G7','H8','I9'],['A9','B8','C7','D6','E5','F4','G3','H2','I1']]
 units = dict((s, [u for u in unitlist if s in u]) for s in boxes)
 # unit [example]> ['A1', 'A2', 'A3', 'A4', 'A5', 'A6', 'A7', 'A8', 'A9']
+
+# peers are all the grid locations in the same unit as a given location
 peers = dict((s, set(sum(units[s],[]))-set([s])) for s in boxes)
 
 
@@ -46,9 +49,12 @@ def naked_twins(values, n=2):
     """
     # Find all instances of naked twins
     for unit in unitlist:
+        # create a reverse dict. mapping value_options to locations on the grid
         rev_dict = {}
         for i in unit:
             if len(values[i]) == n:
+                # a list is needed since we do not know how many grid locations
+                # will contain a set of given values
                 rev_dict.setdefault(values[i], list())
                 rev_dict[values[i]].append(i)
 
@@ -181,7 +187,6 @@ def search(values):
     Iterate all units, find unfilled squares with the fewest possible options.
     NOTE: This function is recursive.
 
-
     Input: Sudoku in dictionary form.
     Output: Resulting Sudoku in dictionary form (solved).
     """
@@ -214,7 +219,6 @@ def solve(grid):
     Returns:
         The dictionary representation of the final sudoku grid. False if no solution exists.
     """
-    
     values = grid_values(grid)
     values = search(values)
     return values

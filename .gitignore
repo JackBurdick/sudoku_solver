@@ -48,3 +48,5 @@ Temporary Items
 objects/__pycache__/*
 __pycache__/*
 .udacity-pa/__pycache__/*
+sudoku-67464.zip
+sudoku-result-67464.json

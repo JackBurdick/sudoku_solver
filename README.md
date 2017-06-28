@@ -14,10 +14,6 @@
 > the lower left (A9 -> I1).
 
 
-##### Pygame
-Pygame is used for attempt visualization.
-> if interested, please see how to download pygame [here](http://www.pygame.org/download.shtml).
-
 ### Code
 * `solution.py`
     * Solution script.

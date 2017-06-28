@@ -1,5 +1,7 @@
 assignments = []
 
+
+############################ Global vars
 DIAGONAL=True
 
 # set up
@@ -11,10 +13,12 @@ def cross(A, B):
 # boxes are a list of every location on the grid
 boxes = cross(rows, cols)
 
+# units are `units` in a grid that can only contain one instance of 1-9
+# in Sudoku, a row, col, and 3x3 square are all standard units.
+# a diagonal unit (up/down) the main diagonals are also considered a unit.
 row_units = [cross(r, cols) for r in rows]
 column_units = [cross(rows, c) for c in cols]
 square_units = [cross(rs, cs) for rs in ('ABC','DEF','GHI') for cs in ('123','456','789')]
-
 unitlist = row_units + column_units + square_units
 if DIAGONAL:
         unitlist += [['A1','B2','C3','D4','E5','F6','G7','H8','I9'],['A9','B8','C7','D6','E5','F4','G3','H2','I1']]
@@ -24,6 +28,7 @@ units = dict((s, [u for u in unitlist if s in u]) for s in boxes)
 # peers are all the grid locations in the same unit as a given location
 peers = dict((s, set(sum(units[s],[]))-set([s])) for s in boxes)
 
+################################################################################
 
 def assign_value(values, box, value):
     """
